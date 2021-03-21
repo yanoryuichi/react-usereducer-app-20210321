@@ -1,8 +1,6 @@
 import { useReducer, useState } from "react";
 
-function App() {
-  const [swid, setSwid] = useState(1);
-
+function useSwapiSearch() {
   let [state, dispatch] = useReducer(
     (state, action) => {
       switch (action.type) {
@@ -36,7 +34,7 @@ function App() {
     }
   );
 
-  function handleSearch() {
+  function handleSearch(swid) {
     dispatch({ type: "SEARCHING" });
     fetch("https://swapi.dev/api/people/" + swid)
       .then((response) => {
@@ -54,7 +52,13 @@ function App() {
       });
   }
 
-  let { searching, response, error } = state;
+  return [state.searching, state.response, state.error, handleSearch];
+}
+
+function App() {
+  const [swid, setSwid] = useState(1);
+
+  const [searching, response, error, handleSearch] = useSwapiSearch();
 
   return (
     <div>
@@ -66,7 +70,7 @@ function App() {
           setSwid(event.target.value);
         }}
       />
-      <button onClick={() => handleSearch()}>Search</button>
+      <button onClick={() => handleSearch(swid)}>Search</button>
       <br />
       {error && <div>Error: {error}</div>}
       {searching && <div>Searching...</div>}
